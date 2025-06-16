@@ -5,8 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from torchvision import transforms
 from PIL import Image
 import torch
-from model import ResNet, BasicBlock
 import io
+from model import load_mobilenet
+
 
 app = FastAPI()
 
@@ -18,9 +19,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
-model = ResNet(img_channels=3, num_layers=18, block=BasicBlock, num_classes=10).to(device)
-model.load_state_dict(torch.load('resnet18_cifar10.pth', map_location=device))
+model = load_mobilenet(num_classes=10).to(device)
+model.load_state_dict(torch.load('mobilenet_cifar10.pth', map_location=device))
 model.eval()
+
 
 # Transform for input images
 transform = transforms.Compose([
